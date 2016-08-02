@@ -31,7 +31,7 @@ class FacebookStrategy extends OpauthStrategy{
 	 * Auth request
 	 */
 	public function request(){
-		$url = 'https://www.facebook.com/dialog/oauth';
+		$url = 'https://www.facebook.com/v2.7/dialog/oauth';
 		$params = array(
 			'client_id' => $this->strategy['app_id'],
 			'redirect_uri' => $this->strategy['redirect_uri']
@@ -70,7 +70,7 @@ class FacebookStrategy extends OpauthStrategy{
 					'uid' => $me->id,
 					'info' => array(
 						'name' => $me->name,
-						'image' => 'https://graph.facebook.com/'.$me->id.'/picture?type=square'
+						'image' => 'https://graph.facebook.com/v2.7/'.$me->id.'/picture?type=square'
 					),
 					'credentials' => array(
 						'token' => $results['access_token'],
@@ -78,15 +78,25 @@ class FacebookStrategy extends OpauthStrategy{
 					),
 					'raw' => $me
 				);
-				
+
+				$username = "";
+				if (!empty($me->name)){
+					$username = strtolower(trim(str_replace(' ','-', $me->name)));
+				}
+
+				$email = "";
+				if (!empty($me->email)){
+					$email = $me->email;
+				}
+
+				$this->auth['info']['nickname'] = $username;
+				$this->auth['info']['email'] = $email;
 				if (!empty($me->email)) $this->auth['info']['email'] = $me->email;
-				if (!empty($me->username)) $this->auth['info']['nickname'] = $me->username;
-				if (!empty($me->first_name)) $this->auth['info']['first_name'] = $me->first_name;
 				if (!empty($me->last_name)) $this->auth['info']['last_name'] = $me->last_name;
 				if (!empty($me->location)) $this->auth['info']['location'] = $me->location->name;
 				if (!empty($me->link)) $this->auth['info']['urls']['facebook'] = $me->link;
 				if (!empty($me->website)) $this->auth['info']['urls']['website'] = $me->website;
-				
+
 				/**
 				 * Missing optional info values
 				 * - description
@@ -125,7 +135,7 @@ class FacebookStrategy extends OpauthStrategy{
 	 * @return array Parsed JSON results
 	 */
 	private function me($access_token){
-		$me = $this->serverGet('https://graph.facebook.com/me', array('access_token' => $access_token), null, $headers);
+		$me = $this->serverGet('https://graph.facebook.com/v2.7/me', array('access_token' => $access_token), null, $headers);
 		if (!empty($me)){
 			return json_decode($me);
 		}
