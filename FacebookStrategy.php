@@ -52,7 +52,7 @@ class FacebookStrategy extends OpauthStrategy
 	 */
 	public function int_callback(){
 		if (array_key_exists('code', $_GET) && !empty($_GET['code'])){
-			$url = 'https://graph.facebook.com/v2.7/oauth/access_token';
+			$url = 'https://graph.facebook.com/oauth/access_token';
 			$params = array(
 				'client_id' =>$this->strategy['app_id'],
 				'client_secret' => $this->strategy['app_secret'],
